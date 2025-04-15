@@ -22,9 +22,7 @@ const UsersScreen: React.FC = () => {
 
   if (selectedUser) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Messages user={selectedUser} onBack={handleBack} />
-      </SafeAreaView>
+      <Messages user={selectedUser} onBack={handleBack} />
     );
   }
 

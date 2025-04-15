@@ -36,6 +36,9 @@ const GroupMembersScreen: React.FC<GroupMembersScreenProps> = ({ group, onBack }
       </SafeAreaView>
     );
   }
+  function onBackHandler(): void {
+    handleBack();
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -49,6 +52,8 @@ const GroupMembersScreen: React.FC<GroupMembersScreenProps> = ({ group, onBack }
             },
           }}
           onItemPress={handleUserPress}
+          hideBackButton={false} 
+          onBack={onBackHandler}
           onError={(error) => {
             console.error('Error in GroupMembers component:', error);
           }}

@@ -29,17 +29,13 @@ const GroupsScreen: React.FC = () => {
 
   if (showMembers && selectedGroup) {
     return (
-      <SafeAreaView style={styles.container}>
-        <GroupMembersScreen group={selectedGroup} onBack={handleBack} />
-      </SafeAreaView>
+      <GroupMembersScreen group={selectedGroup} onBack={handleBack} />
     );
   }
 
   if (selectedGroup) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Messages group={selectedGroup} onBack={handleBack} />
-      </SafeAreaView>
+      <Messages group={selectedGroup} onBack={handleBack} />
     );
   }
 
