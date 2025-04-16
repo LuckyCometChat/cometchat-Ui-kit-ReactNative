@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, StatusBar } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, StatusBar, Alert } from 'react-native';
 import {
   CometChatConversations,
   CometChatUIKit,
@@ -11,51 +11,76 @@ import Messages from './Messages';
 import UsersScreen from './UsersScreen';
 import GroupsScreen from './GroupsScreen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { CallManager } from '../call/CallManager';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // WhatsApp Colors
-const WHATSAPP_GREEN = '#075E54'; // Header green
-const WHATSAPP_LIGHT_GREEN = '#128C7E'; // Secondary green
-const WHATSAPP_TEAL = '#25D366'; // Accent green
+const WHATSAPP_GREEN = '#075E54'; 
+const WHATSAPP_LIGHT_GREEN = '#128C7E'; 
+const WHATSAPP_TEAL = '#25D366'; 
 
-const ChatScreen = () => {
-  const [messageUser, setMessageUser] = useState(null);
-  const [messageGroup, setMessageGroup] = useState(null);
+interface ChatScreenProps {
+  onLogout?: () => void;
+}
+
+const ChatScreen: React.FC<ChatScreenProps> = ({ onLogout }) => {
+  const [messageUser, setMessageUser] = useState<CometChat.User | undefined>(undefined);
+  const [messageGroup, setMessageGroup] = useState<CometChat.Group | undefined>(undefined);
   const [activeScreen, setActiveScreen] = useState('conversations');
+  const [showCallManager, setShowCallManager] = useState(false);
 
   const handleBack = () => {
     setMessageUser(undefined);
     setMessageGroup(undefined);
   };
 
-  const handleUserSelect = (user) => {
+  const handleUserSelect = (user: CometChat.User) => {
     setMessageUser(user);
   };
 
-  const handleGroupSelect = (group) => {
+  const handleGroupSelect = (group: CometChat.Group) => {
     setMessageGroup(group);
   };
 
-  const renderHeader = () => {
-    if (messageUser || messageGroup) {
-      return null; // Messages component will handle its own header
-    }
+  const handleCallEnded = () => {
+    setShowCallManager(false);
+  };
 
-    return (
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Chats</Text>
-        <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.headerButton}>
-            <Ionicons name="search" size={22} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.headerButton}>
-            <Ionicons name="ellipsis-vertical" size={22} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      </View>
+  const handleLogout = async () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          onPress: async () => {
+            try {
+              await CometChatUIKit.logout();
+              await AsyncStorage.removeItem('loggedInUser');
+              if (onLogout) {
+                onLogout();
+              }
+            } catch (error) {
+              console.error('Logout failed:', error);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
     );
   };
 
+ 
+
   const renderContent = () => {
+    if (showCallManager) {
+      return <CallManager onCallEnded={handleCallEnded} />;
+    }
+
     if (messageUser || messageGroup) {
       return (
         <Messages
@@ -102,10 +127,10 @@ const ChatScreen = () => {
                 item.getConversationType() ===
                 CometChatUiKitConstants.ConversationTypeConstants.user
               ) {
-                setMessageUser(item.getConversationWith());
+                setMessageUser(item.getConversationWith() as CometChat.User);
                 return;
               }
-              setMessageGroup(item.getConversationWith());
+              setMessageGroup(item.getConversationWith() as CometChat.Group);
             }}
           />
         );
@@ -116,12 +141,11 @@ const ChatScreen = () => {
     <View style={styles.container}>
       <StatusBar backgroundColor={WHATSAPP_GREEN} barStyle="light-content" />
       <CometChatThemeProvider theme={{palette: {primary: WHATSAPP_GREEN}}}>
-        {/* {renderHeader()} */}
         <View style={styles.contentContainer}>
           {renderContent()}
         </View>
         
-        {!messageUser && !messageGroup && (
+        {!messageUser && !messageGroup && !showCallManager && (
           <View style={styles.footerTabs}>
             <TouchableOpacity
               style={styles.tabItem}
@@ -181,7 +205,7 @@ const ChatScreen = () => {
         )}
 
         {/* Floating Action Button for new chat/group */}
-        {activeScreen === 'conversations' && !messageUser && !messageGroup && (
+        {activeScreen === 'conversations' && !messageUser && !messageGroup && !showCallManager && (
           <TouchableOpacity style={styles.floatingButton}>
             <Ionicons name="chatbubbles" size={24} color="#FFFFFF" />
           </TouchableOpacity>

@@ -21,6 +21,10 @@ const GroupMembersScreen: React.FC<GroupMembersScreenProps> = ({ group, onBack }
     setSelectedUser(user);
   };
 
+  const onLongPressHandler = (groupMember: any) => {
+    console.log('Group member long pressed:', groupMember.getName ? groupMember.getName() : groupMember.uid);
+  };
+
   const handleBack = () => {
     if (selectedUser) {
       setSelectedUser(undefined);
@@ -54,6 +58,7 @@ const GroupMembersScreen: React.FC<GroupMembersScreenProps> = ({ group, onBack }
           onItemPress={handleUserPress}
           hideBackButton={false} 
           onBack={onBackHandler}
+          onItemLongPress={onLongPressHandler}
           onError={(error) => {
             console.error('Error in GroupMembers component:', error);
           }}

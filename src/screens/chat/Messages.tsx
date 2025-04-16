@@ -8,6 +8,7 @@ import { CometChat } from '@cometchat/chat-sdk-react-native';
 import GroupMembersScreen from './GroupMembersScreen';
 import MessageList from './MessageList';
 import MessageComposer from './MessageComposer';
+import { CallManager } from '../call/CallManager';
 
 interface MessagesProps {
   user?: CometChat.User;
@@ -18,7 +19,8 @@ interface MessagesProps {
 const Messages: React.FC<MessagesProps> = ({ user, group, onBack }) => {
   const [showMembers, setShowMembers] = useState(false);
   const [parentMessage, setParentMessage] = useState<CometChat.BaseMessage | null>(null);
-
+  const [showCallManager, setShowCallManager] = useState(false);
+  
   const handleViewMembers = () => {
     setShowMembers(true);
   };
@@ -31,9 +33,57 @@ const Messages: React.FC<MessagesProps> = ({ user, group, onBack }) => {
     setParentMessage(null);
   };
 
+  const handleCallEnded = () => {
+    setShowCallManager(false);
+  };
+  
+  const handleCallInitiated = (sessionID: string) => {
+    setShowCallManager(true);
+  };
+
+  const handleAudioCall = () => {
+    console.log('Audio call clicked');
+    if (user) {
+      handleCallInitiated(user.getUid());
+    }
+  };
+
+  const handleVideoCall = () => {
+    console.log('Video call clicked');
+    if (user) {
+      handleCallInitiated(user.getUid());
+    }
+  };
+
   if (showMembers && group) {
     return <GroupMembersScreen group={group} onBack={handleBackFromMembers} />;
   }
+
+  if (showCallManager) {
+    return <CallManager onCallEnded={handleCallEnded} />;
+  }
+
+  // Create a custom AuxiliaryButtonView component for call buttons
+  const AuxiliaryButtonView = () => {
+    if (!user) return null;
+    
+    return (
+      <View style={{ flexDirection: 'row' }}>
+        <TouchableOpacity 
+          style={styles.callButton}
+          onPress={handleAudioCall}
+        >
+          <Text style={styles.callButtonText}>📞</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.callButton}
+          onPress={handleVideoCall}
+        >
+          <Text style={styles.callButtonText}>📹</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.mainContainer}>
@@ -42,7 +92,10 @@ const Messages: React.FC<MessagesProps> = ({ user, group, onBack }) => {
         group={group} 
         onBack={onBack}
         hideBackButton={false}
+        onError={(error) => console.log('Message Header error', error)}
+        AuxiliaryButtonView={AuxiliaryButtonView}
       />
+      
       {group && (
         <TouchableOpacity 
           style={styles.viewMembersButton} 
@@ -83,20 +136,30 @@ const Messages: React.FC<MessagesProps> = ({ user, group, onBack }) => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   viewMembersButton: {
+    padding: 10,
     backgroundColor: '#128C7E',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    alignItems: 'center',
+    margin: 8,
     borderRadius: 4,
-    marginHorizontal: 10,
-    marginVertical: 5,
-    alignSelf: 'flex-start',
   },
   viewMembersText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: 12,
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  callButton: {
+    height: 40,
+    width: 40,
+    borderRadius: 20,
+    backgroundColor: '#E5E5E5',
+    marginRight: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  callButtonText: {
+    fontSize: 20,
   },
 });
 

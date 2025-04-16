@@ -11,19 +11,23 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "@cometchat/chat-sdk-react-native": "^4.0.12",
     "@cometchat/chat-uikit-react-native": "^5.0.0-beta.1",
+    "@cometchat/chat-sdk-react-native": "^4.0.5",
     "@expo/vector-icons": "^14.1.0",
-    "@react-native-async-storage/async-storage": "^2.1.2",
+    "@react-native-async-storage/async-storage": "^1.17.5",
     "@react-native-clipboard/clipboard": "^1.16.2",
     "@react-native-community/datetimepicker": "^8.3.0",
     "@types/react-native-vector-icons": "^6.4.18",
+    "@react-native-community/netinfo": "7.1.7",
     "dayjs": "^1.11.13",
     "react": "19.0.0",
     "react-native": "0.79.0",
     "react-native-svg": "^15.11.2",
     "react-native-vector-icons": "^10.2.0",
-    "react-native-video": "^6.12.0"
+    "react-native-video": "^6.12.0",
+    "react-native-background-timer": "2.4.1",
+  "react-native-callstats": "3.73.7",
+  "react-native-webrtc": "1.106.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

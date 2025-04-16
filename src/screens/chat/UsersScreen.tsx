@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import {
   CometChatUsers,
   CometChatThemeProvider,
@@ -11,10 +11,23 @@ interface UsersScreenProps {
 }
 
 const UsersScreen: React.FC<UsersScreenProps> = ({ onUserSelect }) => {
+  const usersRequestBuilder = new CometChat.UsersRequestBuilder()
+    .setLimit(30)
+    .setStatus(CometChat.USER_STATUS.ONLINE);
+
   return (
     <View style={styles.container}>
       <CometChatThemeProvider>
         <CometChatUsers
+        AppBarOptions={()=>{
+          return(
+            <TouchableOpacity>
+              onPress={()=>{
+                console.log("pressed")
+              }}
+            </TouchableOpacity>
+          )
+        }}
           style={{
             containerStyle: {
               width: '100%',
@@ -22,6 +35,7 @@ const UsersScreen: React.FC<UsersScreenProps> = ({ onUserSelect }) => {
             },
           }}
           onItemPress={onUserSelect}
+          // usersRequestBuilder={usersRequestBuilder}
           onError={(error) => {
             console.error('Error in Users component:', error);
           }}
@@ -38,4 +52,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UsersScreen; 
+export default UsersScreen;

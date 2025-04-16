@@ -6,20 +6,48 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { Platform, PermissionsAndroid, View, SafeAreaView } from 'react-native';
+import { Platform, PermissionsAndroid, View } from 'react-native';
 import { CometChatUIKit } from '@cometchat/chat-uikit-react-native';
 import { cometChatConfig } from './src/config/cometChatConfig';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import ChatScreen from './src/screens/chat/ChatScreen';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     initializeCometChat();
+    checkLoginStatus();
   }, []);
+
+  const checkLoginStatus = async () => {
+    try {
+      const loggedInUser = await AsyncStorage.getItem('loggedInUser');
+      if (loggedInUser) {
+        setIsLoggedIn(true);
+      }
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error checking login status:', error);
+      setIsLoading(false);
+    }
+  };
+
+  const handleLoginSuccess = async () => {
+    try {
+      await AsyncStorage.setItem('loggedInUser', 'true');
+      setIsLoggedIn(true);
+    } catch (error) {
+      console.error('Error saving login state:', error);
+    }
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
 
   const initializeCometChat = async () => {
     try {
@@ -27,13 +55,6 @@ const App = () => {
       await CometChatUIKit.init(cometChatConfig);
       console.log('CometChatUiKit successfully initialized');
       setIsInitialized(true);
-      
-      // Check if user is already logged in
-      const user = await CometChatUIKit.getLoggedInUser();
-      if (user) {
-        console.log('User already logged in:', user.getName());
-        setIsLoggedIn(true);
-      }
     } catch (error) {
       console.error('Initialization failed:', error);
     }
@@ -62,7 +83,7 @@ const App = () => {
     }
   };
 
-  if (!isInitialized) {
+  if (!isInitialized || isLoading) {
     return null; 
   }
 
@@ -73,9 +94,9 @@ const App = () => {
       ...(Platform.OS === 'android' ? { marginTop: 30 } : {marginTop: 50 })
     }}>
       {isLoggedIn ? (
-        <ChatScreen />
+        <ChatScreen onLogout={handleLogout} />
       ) : (
-        <LoginScreen onLoginSuccess={() => setIsLoggedIn(true)} />
+        <LoginScreen onLoginSuccess={handleLoginSuccess} />
       )}
     </View>
   );
