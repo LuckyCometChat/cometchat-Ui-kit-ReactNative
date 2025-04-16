@@ -16,17 +16,9 @@ import ChatScreen from './src/screens/chat/ChatScreen';
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [showIconTest, setShowIconTest] = useState(false); // Set to false to skip icon test
 
   useEffect(() => {
     initializeCometChat();
-    
-    // Automatically hide the icon test after 5 seconds
-    if (showIconTest) {
-      setTimeout(() => {
-        setShowIconTest(false);
-      }, 5000);
-    }
   }, []);
 
   const initializeCometChat = async () => {
@@ -35,8 +27,13 @@ const App = () => {
       await CometChatUIKit.init(cometChatConfig);
       console.log('CometChatUiKit successfully initialized');
       setIsInitialized(true);
-      // Auto-login for testing
-      setIsLoggedIn(true);
+      
+      // Check if user is already logged in
+      const user = await CometChatUIKit.getLoggedInUser();
+      if (user) {
+        console.log('User already logged in:', user.getName());
+        setIsLoggedIn(true);
+      }
     } catch (error) {
       console.error('Initialization failed:', error);
     }
@@ -72,11 +69,10 @@ const App = () => {
   return (
     <View style={{ 
       flex: 1, 
-      ...(Platform.OS === 'android' ? { marginTop: 30 } : {marginTop: 35 })
+      marginBottom:20,
+      ...(Platform.OS === 'android' ? { marginTop: 30 } : {marginTop: 50 })
     }}>
-      {showIconTest ? (
-        <IconTest />
-      ) : isLoggedIn ? (
+      {isLoggedIn ? (
         <ChatScreen />
       ) : (
         <LoginScreen onLoginSuccess={() => setIsLoggedIn(true)} />
