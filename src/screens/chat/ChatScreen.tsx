@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, SafeAreaView, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, StatusBar } from 'react-native';
 import {
   CometChatConversations,
   CometChatUIKit,
@@ -10,15 +10,49 @@ import { CometChat } from '@cometchat/chat-sdk-react-native';
 import Messages from './Messages';
 import UsersScreen from './UsersScreen';
 import GroupsScreen from './GroupsScreen';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const ChatScreen: React.FC = () => {
-  const [messageUser, setMessageUser] = useState<CometChat.User>();
-  const [messageGroup, setMessageGroup] = useState<CometChat.Group>();
-  const [activeScreen, setActiveScreen] = useState<'conversations' | 'users' | 'groups'>('conversations');
+// WhatsApp Colors
+const WHATSAPP_GREEN = '#075E54'; // Header green
+const WHATSAPP_LIGHT_GREEN = '#128C7E'; // Secondary green
+const WHATSAPP_TEAL = '#25D366'; // Accent green
+
+const ChatScreen = () => {
+  const [messageUser, setMessageUser] = useState(null);
+  const [messageGroup, setMessageGroup] = useState(null);
+  const [activeScreen, setActiveScreen] = useState('conversations');
 
   const handleBack = () => {
     setMessageUser(undefined);
     setMessageGroup(undefined);
+  };
+
+  const handleUserSelect = (user) => {
+    setMessageUser(user);
+  };
+
+  const handleGroupSelect = (group) => {
+    setMessageGroup(group);
+  };
+
+  const renderHeader = () => {
+    if (messageUser || messageGroup) {
+      return null; // Messages component will handle its own header
+    }
+
+    return (
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Chats</Text>
+        <View style={styles.headerActions}>
+          <TouchableOpacity style={styles.headerButton}>
+            <Ionicons name="search" size={22} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.headerButton}>
+            <Ionicons name="ellipsis-vertical" size={22} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
   };
 
   const renderContent = () => {
@@ -34,9 +68,9 @@ const ChatScreen: React.FC = () => {
 
     switch (activeScreen) {
       case 'users':
-        return <UsersScreen />;
+        return <UsersScreen onUserSelect={handleUserSelect} />;
       case 'groups':
-        return <GroupsScreen />;
+        return <GroupsScreen onGroupSelect={handleGroupSelect} />;
       default:
         return (
           <CometChatConversations
@@ -44,17 +78,34 @@ const ChatScreen: React.FC = () => {
               containerStyle: {
                 width: '100%',
                 height: '100%',
+                backgroundColor: '#FFFFFF',
+              },
+              listStyle: {
+                backgroundColor: '#FFFFFF',
+              },
+              itemStyle: {
+                backgroundColor: '#FFFFFF',
+                titleStyle: {
+                  color: '#000000',
+                  fontWeight: '600',
+                },
+                subtitleStyle: {
+                  color: '#666666',
+                },
+                timeStampStyle: {
+                  color: '#25D366',
+                },
               },
             }}
-            onItemPress={(item: CometChat.Conversation) => {
+            onItemPress={(item) => {
               if (
                 item.getConversationType() ===
                 CometChatUiKitConstants.ConversationTypeConstants.user
               ) {
-                setMessageUser(item.getConversationWith() as CometChat.User);
+                setMessageUser(item.getConversationWith());
                 return;
               }
-              setMessageGroup(item.getConversationWith() as CometChat.Group);
+              setMessageGroup(item.getConversationWith());
             }}
           />
         );
@@ -62,53 +113,65 @@ const ChatScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <CometChatThemeProvider>
+    <View style={styles.container}>
+      <StatusBar backgroundColor={WHATSAPP_GREEN} barStyle="light-content" />
+      <CometChatThemeProvider theme={{palette: {primary: WHATSAPP_GREEN}}}>
+        {/* {renderHeader()} */}
+        <View style={styles.contentContainer}>
+          {renderContent()}
+        </View>
+        
         {!messageUser && !messageGroup && (
-          <View style={styles.navigationContainer}>
+          <View style={styles.footerTabs}>
             <TouchableOpacity
-              style={[
-                styles.navButton,
-                activeScreen === 'conversations' && styles.activeNavButton,
-              ]}
+              style={styles.tabItem}
               onPress={() => setActiveScreen('conversations')}
             >
+              <Ionicons
+                name="chatbubble"
+                size={24}
+                color={activeScreen === 'conversations' ? WHATSAPP_TEAL : '#9E9E9E'}
+              />
               <Text
                 style={[
-                  styles.navButtonText,
-                  activeScreen === 'conversations' && styles.activeNavButtonText,
+                  styles.tabLabel,
+                  { color: activeScreen === 'conversations' ? WHATSAPP_TEAL : '#9E9E9E' },
                 ]}
               >
-                Conversations
+                Chats
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[
-                styles.navButton,
-                activeScreen === 'users' && styles.activeNavButton,
-              ]}
+              style={styles.tabItem}
               onPress={() => setActiveScreen('users')}
             >
+              <Ionicons
+                name="people"
+                size={24}
+                color={activeScreen === 'users' ? WHATSAPP_TEAL : '#9E9E9E'}
+              />
               <Text
                 style={[
-                  styles.navButtonText,
-                  activeScreen === 'users' && styles.activeNavButtonText,
+                  styles.tabLabel,
+                  { color: activeScreen === 'users' ? WHATSAPP_TEAL : '#9E9E9E' },
                 ]}
               >
                 Users
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[
-                styles.navButton,
-                activeScreen === 'groups' && styles.activeNavButton,
-              ]}
+              style={styles.tabItem}
               onPress={() => setActiveScreen('groups')}
             >
+              <Ionicons
+                name="people-circle"
+                size={24}
+                color={activeScreen === 'groups' ? WHATSAPP_TEAL : '#9E9E9E'}
+              />
               <Text
                 style={[
-                  styles.navButtonText,
-                  activeScreen === 'groups' && styles.activeNavButtonText,
+                  styles.tabLabel,
+                  { color: activeScreen === 'groups' ? WHATSAPP_TEAL : '#9E9E9E' },
                 ]}
               >
                 Groups
@@ -116,45 +179,80 @@ const ChatScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
         )}
-        {renderContent()}
+
+        {/* Floating Action Button for new chat/group */}
+        {activeScreen === 'conversations' && !messageUser && !messageGroup && (
+          <TouchableOpacity style={styles.floatingButton}>
+            <Ionicons name="chatbubbles" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        )}
       </CometChatThemeProvider>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
-  navigationContainer: {
+  header: {
+    height: 100,
+    backgroundColor: WHATSAPP_GREEN,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+  },
+  headerTitle: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: 'bold',
+    paddingTop:40
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop:40
+  },
+  headerButton: {
+    paddingHorizontal: 10,
+    paddingTop:10
+  },
+  contentContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  footerTabs: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
-    padding: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
+    height: 60,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+    elevation: 8,
   },
-  navButton: {
+  tabItem: {
     flex: 1,
-    padding: 10,
+    justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 5,
+    paddingVertical: 8,
   },
-  activeNavButton: {
-    backgroundColor: 'rgba(18, 140, 126, 0.1)',
+  tabLabel: {
+    fontSize: 12,
+    marginTop: 2,
   },
-  navButtonText: {
-    color: '#666666',
-    fontWeight: '600',
-  },
-  activeNavButtonText: {
-    color: '#128C7E',
+  floatingButton: {
+    position: 'absolute',
+    bottom: 80,
+    right: 20,
+    backgroundColor: WHATSAPP_LIGHT_GREEN,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
   },
 });
 
-export default ChatScreen; 
+export default ChatScreen;
