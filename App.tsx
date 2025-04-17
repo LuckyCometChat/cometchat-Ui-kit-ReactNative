@@ -91,7 +91,7 @@ const App = () => {
     <View style={{ 
       flex: 1, 
       marginBottom:20,
-      ...(Platform.OS === 'android' ? { marginTop: 30 } : {marginTop: 50 })
+      // ...(Platform.OS === 'android' ? { marginTop: 30 } : {})
     }}>
       {isLoggedIn ? (
         <ChatScreen onLogout={handleLogout} />

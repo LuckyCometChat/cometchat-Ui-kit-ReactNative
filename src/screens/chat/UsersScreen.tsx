@@ -19,20 +19,17 @@ const UsersScreen: React.FC<UsersScreenProps> = ({ onUserSelect }) => {
     <View style={styles.container}>
       <CometChatThemeProvider>
         <CometChatUsers
-        AppBarOptions={()=>{
-          return(
-            <TouchableOpacity>
-              onPress={()=>{
-                console.log("pressed")
-              }}
-            </TouchableOpacity>
-          )
-        }}
           style={{
             containerStyle: {
               width: '100%',
               height: '100%',
+              backgroundColor: '#FFFFFF',
             },
+            headerContainerStyle: {
+              // backgroundColor: "#075E54",
+              paddingTop: 60,
+            },
+            
           }}
           onItemPress={onUserSelect}
           // usersRequestBuilder={usersRequestBuilder}

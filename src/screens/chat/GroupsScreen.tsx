@@ -20,6 +20,11 @@ const GroupsScreen: React.FC<GroupsScreenProps> = ({ onGroupSelect }) => {
               width: '100%',
               height: '100%',
             },
+            headerContainerStyle: {
+              // backgroundColor: "#075E54",
+              // borderBottomWidth: 0,
+              paddingTop: 60,
+            },
           }}
           onItemPress={onGroupSelect}
           onError={(error) => {

@@ -104,6 +104,16 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onLogout }) => {
                 width: '100%',
                 height: '100%',
                 backgroundColor: '#FFFFFF',
+                
+              },
+              headerContainerStyle: {
+                backgroundColor: "#075E54",
+                borderBottomWidth: 0,
+                paddingTop: 60,
+              },
+              titleStyle: {
+                color: '#FFFFFF',
+                fontWeight: 'bold',
               },
               listStyle: {
                 backgroundColor: '#FFFFFF',
@@ -119,6 +129,11 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onLogout }) => {
                 },
                 timeStampStyle: {
                   color: '#25D366',
+                },
+                badgeStyle: {
+                  containerStyle: {
+                    backgroundColor: "#075E54",
+                  },
                 },
               },
             }}
@@ -154,12 +169,12 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onLogout }) => {
               <Ionicons
                 name="chatbubble"
                 size={24}
-                color={activeScreen === 'conversations' ? WHATSAPP_TEAL : '#9E9E9E'}
+                color={activeScreen === 'conversations' ? '#075E54' : '#9E9E9E'}
               />
               <Text
                 style={[
                   styles.tabLabel,
-                  { color: activeScreen === 'conversations' ? WHATSAPP_TEAL : '#9E9E9E' },
+                  { color: activeScreen === 'conversations' ? '#075E54' : '#9E9E9E' },
                 ]}
               >
                 Chats
@@ -172,12 +187,12 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onLogout }) => {
               <Ionicons
                 name="people"
                 size={24}
-                color={activeScreen === 'users' ? WHATSAPP_TEAL : '#9E9E9E'}
+                color={activeScreen === 'users' ? '#075E54' : '#9E9E9E'}
               />
               <Text
                 style={[
                   styles.tabLabel,
-                  { color: activeScreen === 'users' ? WHATSAPP_TEAL : '#9E9E9E' },
+                  { color: activeScreen === 'users' ? '#075E54' : '#9E9E9E' },
                 ]}
               >
                 Users
@@ -190,12 +205,12 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onLogout }) => {
               <Ionicons
                 name="people-circle"
                 size={24}
-                color={activeScreen === 'groups' ? WHATSAPP_TEAL : '#9E9E9E'}
+                color={activeScreen === 'groups' ? '#075E54' : '#9E9E9E'}
               />
               <Text
                 style={[
                   styles.tabLabel,
-                  { color: activeScreen === 'groups' ? WHATSAPP_TEAL : '#9E9E9E' },
+                  { color: activeScreen === 'groups' ? '#075E54' : '#9E9E9E' },
                 ]}
               >
                 Groups
@@ -204,7 +219,6 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onLogout }) => {
           </View>
         )}
 
-        {/* Floating Action Button for new chat/group */}
         {activeScreen === 'conversations' && !messageUser && !messageGroup && !showCallManager && (
           <TouchableOpacity style={styles.floatingButton}>
             <Ionicons name="chatbubbles" size={24} color="#FFFFFF" />
