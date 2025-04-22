@@ -19,7 +19,7 @@ const UsersScreen: React.FC<UsersScreenProps> = ({ onUserSelect }) => {
     <View style={styles.container}>
       <CometChatThemeProvider>
         <CometChatUsers
-          Style={{
+          style={{
             containerStyle: {
               width: '100%',
               height: '100%',

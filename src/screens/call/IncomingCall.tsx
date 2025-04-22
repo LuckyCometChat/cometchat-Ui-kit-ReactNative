@@ -5,20 +5,30 @@ import { CometChatIncomingCall } from '@cometchat/chat-uikit-react-native';
 
 interface IncomingCallProps {
   theme?: any;
+  call?: CometChat.Call;
+  onCallDeclined?: () => void;
+  onCallAccepted?: () => void;
 }
 
-const IncomingCall: React.FC<IncomingCallProps> = ({ theme }) => {
+const IncomingCall: React.FC<IncomingCallProps> = ({ theme, call, onCallDeclined, onCallAccepted }) => {
   const incomingCall = useRef<CometChat.Call | null>(null);
   const [callReceived, setCallReceived] = useState(false);
   const listenerID = "INCOMING_CALL_LISTENER";
 
   useEffect(() => {
-    // Add CometChat call listener
+    // If call is passed as a prop, use it
+    if (call) {
+      incomingCall.current = call;
+      setCallReceived(true);
+      return;
+    }
+
+    // Add CometChat call listener if no call prop is provided
     CometChat.addCallListener(
       listenerID,
       new CometChat.CallListener({
         onIncomingCallReceived: (call: CometChat.Call) => {
-          console.log("Incoming call received:", call);
+          console.log("Incoming call received in IncomingCall component:", call);
           incomingCall.current = call;
           setCallReceived(true);
         },
@@ -39,7 +49,7 @@ const IncomingCall: React.FC<IncomingCallProps> = ({ theme }) => {
       // Remove call listener on component unmount
       CometChat.removeCallListener(listenerID);
     };
-  }, []);
+  }, [call]);
 
   const onDeclineHandler = (message: CometChat.BaseMessage) => {
     if (message instanceof CometChat.Call) {
@@ -47,33 +57,65 @@ const IncomingCall: React.FC<IncomingCallProps> = ({ theme }) => {
         .then(() => {
           console.log("Call rejected successfully");
           setCallReceived(false);
+          if (onCallDeclined) {
+            onCallDeclined();
+          }
         })
         .catch(error => {
           console.error("Call rejection failed:", error);
+          setCallReceived(false);
+          if (onCallDeclined) {
+            onCallDeclined();
+          }
         });
     }
   };
 
   const onAcceptHandler = (message: CometChat.BaseMessage) => {
-    setCallReceived(false);
+    if (message instanceof CometChat.Call) {
+      CometChat.acceptCall(message.getSessionId())
+        .then((acceptedCall) => {
+          console.log("Call accepted successfully:", acceptedCall);
+          // The acceptCall method will navigate to the call screen
+          if (onCallAccepted) {
+            onCallAccepted();
+          }
+        })
+        .catch(error => {
+          console.error("Call acceptance failed:", error);
+          setCallReceived(false);
+          if (onCallAccepted) {
+            onCallAccepted();
+          }
+        });
+    } else {
+      setCallReceived(false);
+    }
   };
 
   const onErrorHandler = (error: CometChat.CometChatException) => {
     console.error("Incoming call error:", error);
+    setCallReceived(false);
+    if (onCallDeclined) {
+      onCallDeclined();
+    }
   };
+
+  // Use either the passed call prop or the call from the listener
+  const currentCall = call || incomingCall.current;
 
   return (
     <>
-      {callReceived && incomingCall.current && (
+      {(callReceived || call) && currentCall && (
         <SafeAreaView style={{ flex: 1 }}>
           <CometChatIncomingCall
-            call={incomingCall.current}
+            call={currentCall}
             onDecline={onDeclineHandler}
             onAccept={onAcceptHandler}
             onError={onErrorHandler}
             style={{
               containerStyle: {
-                backgroundColor: '#075E54',
+                backgroundColor: theme?.backgroundColor || '#075E54',
               },
               avatarStyle: {
                 containerStyle: {
@@ -85,13 +127,13 @@ const IncomingCall: React.FC<IncomingCallProps> = ({ theme }) => {
                 },
               },
               declineCallButtonStyle: {
-                backgroundColor: '#FF5252',
+                backgroundColor: theme?.declineButtonColor || '#FF5252',
               },
               declineCallTextStyle: {
                 color: '#FFFFFF',
               },
               acceptCallButtonStyle: {
-                backgroundColor: '#25D366',
+                backgroundColor: theme?.acceptButtonColor || '#25D366',
               },
             }}
           />

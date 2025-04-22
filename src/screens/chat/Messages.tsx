@@ -90,35 +90,18 @@ const Messages: React.FC<MessagesProps> = ({ user, group, onBack }) => {
     return <OutgoingCall call={outgoingCall} onCallEnded={handleCallEnded} />;
   }
 
-  const AuxiliaryButtonView = () => {
-    return (
-      <View style={{ flexDirection: 'row' }}>
-        <TouchableOpacity 
-          style={styles.callButton}
-          onPress={initiateAudioCall}
-        >
-          <Text style={styles.callButtonText}>📞</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.callButton}
-          onPress={initiateVideoCall}
-        >
-          <Text style={styles.callButtonText}>📹</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
+
+  
 
   return (
     <View style={styles.mainContainer}>
-      {/* <IncomingCall /> */}
+    
       <CometChatMessageHeader 
         user={user} 
         group={group} 
         onBack={onBack}
-        hideBackButton ={false}
-        // AuxiliaryButtonView={AuxiliaryButtonView}
-        // onError={(error) => console.log('Message Header error', error)}
+        showBackButton ={true}
+
         // hideVoiceCallButton = {false}
         // hideVideoCallButton = {false}
         // usersStatusVisibility = {true}

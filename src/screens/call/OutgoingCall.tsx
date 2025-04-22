@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native';
 import { CometChat } from '@cometchat/chat-sdk-react-native';
 import { 
-  CometChatOutgoingCall, 
-  CometChatUiKitConstants 
+  CometChatOutgoingCall,
+  CometChatUiKitConstants,
+  CallingPackage
 } from '@cometchat/chat-uikit-react-native';
+import OngoingCallScreen from './OngoingCallScreen';
+
+const CometChatCalls = CallingPackage.CometChatCalls;
 
 interface OutgoingCallProps {
   call: CometChat.Call;
@@ -13,6 +17,39 @@ interface OutgoingCallProps {
 }
 
 const OutgoingCall: React.FC<OutgoingCallProps> = ({ call, onCallEnded, theme }) => {
+  const listenerID = "OUTGOING_CALL_LISTENER";
+  const [acceptedCallSession, setAcceptedCallSession] = useState<string | null>(null);
+  const [callSettings, setCallSettings] = useState<any>(null);
+
+  useEffect(() => {
+    // Add call listener to handle call events
+    CometChat.addCallListener(
+      listenerID,
+      new CometChat.CallListener({
+        onOutgoingCallAccepted: (acceptedCall: CometChat.Call) => {
+          console.log("Outgoing call accepted:", acceptedCall);
+          // When call is accepted, we'll handle it with CometChat's built-in UI
+        },
+        onOutgoingCallRejected: (rejectedCall: CometChat.Call) => {
+          console.log("Outgoing call rejected:", rejectedCall);
+          if (onCallEnded) {
+            onCallEnded();
+          }
+        },
+        onCallEndedMessageReceived: (call: CometChat.Call) => {
+          console.log("Call ended message received:", call);
+          if (onCallEnded) {
+            onCallEnded();
+          }
+        }
+      })
+    );
+
+    return () => {
+      // Remove call listener on component unmount
+      CometChat.removeCallListener(listenerID);
+    };
+  }, [onCallEnded]);
   
   const cancelCall = (callObj: CometChat.Call) => {
     console.log("Ending call with session ID:", callObj.getSessionId());
@@ -25,8 +62,30 @@ const OutgoingCall: React.FC<OutgoingCallProps> = ({ call, onCallEnded, theme })
       })
       .catch(error => {
         console.error("Call ending failed:", error);
+        if (onCallEnded) {
+          onCallEnded();
+        }
       });
   };
+
+  const handleError = (error: CometChat.CometChatException) => {
+    console.error("Call error:", error);
+    setAcceptedCallSession(null);
+    if (onCallEnded) {
+      onCallEnded();
+    }
+  };
+
+  // If we have an accepted call session, show the ongoing call screen
+  if (acceptedCallSession && callSettings) {
+    return (
+      <OngoingCallScreen
+        sessionId={acceptedCallSession}
+        callSettingsBuilder={callSettings}
+        onError={handleError}
+      />
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -34,6 +93,9 @@ const OutgoingCall: React.FC<OutgoingCallProps> = ({ call, onCallEnded, theme })
         call={call}
         onEndCallButtonPressed={cancelCall}
         style={{
+          containerStyle: {
+            backgroundColor: theme?.backgroundColor || '#075E54',
+          },
           avatarStyle: {
             containerStyle: {
               backgroundColor: '#128C7E',
@@ -44,7 +106,7 @@ const OutgoingCall: React.FC<OutgoingCallProps> = ({ call, onCallEnded, theme })
             },
           },
           endCallButtonStyle: {
-            backgroundColor: '#FF5252',
+            backgroundColor: theme?.endCallButtonColor || '#FF5252',
             borderRadius: 8,
           },
         }}

@@ -128,3 +128,13 @@ project.ext.vectoricons = [
 ]
 
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
+
+afterEvaluate {
+    tasks.named('generateDebugLintReportModel').configure {
+        dependsOn tasks.named('copyReactNativeVectorIconFonts')
+    }
+    tasks.named('lintAnalyzeDebug').configure {
+        dependsOn tasks.named('copyReactNativeVectorIconFonts')
+    }
+}
+
