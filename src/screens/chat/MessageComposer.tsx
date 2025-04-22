@@ -8,6 +8,8 @@ interface MessageComposerProps {
   group?: CometChat.Group;
   parentMessageId?: string;
 }
+// WhatsApp green color
+const WHATSAPP_GREEN = '#25D366';
 
 const MessageComposer: React.FC<MessageComposerProps> = ({
   user,
@@ -20,6 +22,19 @@ const MessageComposer: React.FC<MessageComposerProps> = ({
         user={user}
         group={group}
         parentMessageId={parentMessageId}
+        hideVoiceRecordingButton={true}
+        
+        style={{
+          attachmentIconStyle: {
+           tintColor: "#075E54"
+          },
+          sendIconStyle: {
+            tintColor: '#053D38'
+           },
+          //  sendIconContainerStyle: {
+          //   backgroundColor: WHATSAPP_GREEN
+          //  }
+        }}
       />
     </View>
   );

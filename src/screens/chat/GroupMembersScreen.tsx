@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, SafeAreaView, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, SafeAreaView, TouchableOpacity, Text, ActivityIndicator, Platform } from 'react-native';
 import {
   CometChatGroupMembers,
   CometChatThemeProvider,
@@ -55,10 +55,10 @@ const GroupMembersScreen: React.FC<GroupMembersScreenProps> = ({ group, onBack }
               height: '100%',
             },
           }}
-          onItemPress={handleUserPress}
+          // onItemPress={handleUserPress}
           hideBackButton={false} 
           onBack={onBackHandler}
-          onItemLongPress={onLongPressHandler}
+          // onItemLongPress={onLongPressHandler}
           onError={(error) => {
             console.error('Error in GroupMembers component:', error);
           }}
@@ -71,6 +71,7 @@ const GroupMembersScreen: React.FC<GroupMembersScreenProps> = ({ group, onBack }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    ...(Platform.OS === 'android' ? { marginTop: 25 } : {})
   },
 });
 

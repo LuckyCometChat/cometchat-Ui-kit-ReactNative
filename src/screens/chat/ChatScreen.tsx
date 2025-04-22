@@ -220,8 +220,10 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onLogout }) => {
         )}
 
         {activeScreen === 'conversations' && !messageUser && !messageGroup && !showCallManager && (
-          <TouchableOpacity style={styles.floatingButton}>
-            <Ionicons name="chatbubbles" size={24} color="#FFFFFF" />
+          <TouchableOpacity style={styles.floatingButton}
+          onPress={handleLogout}>
+            <Ionicons name="log-out-outline" size={24} color="#FFFFFF" />
+            {/* <ion-icon name="log-out-outline"></ion-icon> */}
           </TouchableOpacity>
         )}
       </CometChatThemeProvider>
