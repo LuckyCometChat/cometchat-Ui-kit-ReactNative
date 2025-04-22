@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, StatusBar, Alert } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, StatusBar, Alert, SafeAreaView } from 'react-native';
 import {
   CometChatConversations,
   CometChatUIKit,

@@ -59,9 +59,9 @@ const GroupMembersScreen: React.FC<GroupMembersScreenProps> = ({ group, onBack }
           hideBackButton={false} 
           onBack={onBackHandler}
           // onItemLongPress={onLongPressHandler}
-          onError={(error) => {
-            console.error('Error in GroupMembers component:', error);
-          }}
+          // onError={(error) => {
+          //   console.error('Error in GroupMembers component:', error);
+          // }}
         />
       </CometChatThemeProvider>
     </SafeAreaView>

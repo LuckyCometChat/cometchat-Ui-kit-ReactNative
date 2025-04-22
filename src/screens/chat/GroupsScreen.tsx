@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
 import {
   CometChatGroups,
   CometChatThemeProvider,
@@ -15,7 +15,7 @@ const GroupsScreen: React.FC<GroupsScreenProps> = ({ onGroupSelect }) => {
     <View style={styles.container}>
       <CometChatThemeProvider>
         <CometChatGroups
-          style={{
+          Style={{
             containerStyle: {
               width: '100%',
               height: '100%',
@@ -39,6 +39,7 @@ const GroupsScreen: React.FC<GroupsScreenProps> = ({ onGroupSelect }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: 40,
   
   },
 });

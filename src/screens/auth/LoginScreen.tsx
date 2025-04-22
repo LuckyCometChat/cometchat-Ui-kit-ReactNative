@@ -7,12 +7,21 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import { CometChatUIKit } from '@cometchat/chat-uikit-react-native';
 
 interface LoginScreenProps {
   onLoginSuccess: () => void;
 }
+
+// Test users
+const TEST_USERS = [
+  { uid: 'superhero1', name: 'Iron Man' },
+  { uid: 'superhero2', name: 'Captain America' },
+  { uid: 'superhero3', name: 'Spider Man' },
+  { uid: 'superhero4', name: 'Thor' },
+];
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
   const [uid, setUid] = useState('');
@@ -38,7 +47,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>WhatsApp</Text>
       
       <TextInput
@@ -60,9 +69,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
           <Text style={styles.buttonText}>Login</Text>
         )}
       </TouchableOpacity>
-
-     
-    </View>
+    </ScrollView>
   );
 };
 

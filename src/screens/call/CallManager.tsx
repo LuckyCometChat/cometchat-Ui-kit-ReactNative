@@ -4,8 +4,8 @@ import {
   CometChatUIKit
 } from '@cometchat/chat-uikit-react-native';
 import { CallingPackage } from '@cometchat/chat-uikit-react-native/src/calls/CallingPackage';
-import IncomingCallScreen from './IncomingCallScreen';
-import OutgoingCallScreen from './OutgoingCallScreen';
+import IncomingCall from './IncomingCall';
+import OutgoingCall from './OutgoingCall';
 import OngoingCallScreen from './OngoingCallScreen';
 import { cometChatConfig } from '../../config/cometChatConfig';
 
@@ -208,21 +208,14 @@ const CallManager: React.FC<CallManagerProps> = ({ onCallEnded, userId, callType
   }
 
   if (callState === CallState.INCOMING && currentCall) {
-    return (
-      <IncomingCallScreen
-        call={currentCall}
-        onAccept={handleAcceptCall}
-        onDecline={handleDeclineCall}
-      />
-    );
+    return <IncomingCall />;
   }
 
   if (callState === CallState.OUTGOING && currentCall) {
     return (
-      <OutgoingCallScreen
-        call={currentCall}
-        onEndCall={handleEndCall}
-        onCallAccepted={() => {}}
+      <OutgoingCall 
+        call={currentCall} 
+        onCallEnded={handleCallEnded} 
       />
     );
   }

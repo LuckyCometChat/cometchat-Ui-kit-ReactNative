@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import {
   CometChatUsers,
   CometChatThemeProvider,
@@ -19,15 +19,16 @@ const UsersScreen: React.FC<UsersScreenProps> = ({ onUserSelect }) => {
     <View style={styles.container}>
       <CometChatThemeProvider>
         <CometChatUsers
-          style={{
+          Style={{
             containerStyle: {
               width: '100%',
               height: '100%',
               backgroundColor: '#FFFFFF',
+            
             },
             headerContainerStyle: {
               // backgroundColor: "#075E54",
-              paddingTop: 60,
+              marginTop: 60,
             },
             
           }}
@@ -45,7 +46,7 @@ const UsersScreen: React.FC<UsersScreenProps> = ({ onUserSelect }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 2,
+    marginTop: 40,
   },
 });
 

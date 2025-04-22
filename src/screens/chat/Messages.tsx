@@ -1,15 +1,17 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import {
   CometChatMessageHeader,
   CometChatThreadHeader,
+  CometChatUiKitConstants
 } from '@cometchat/chat-uikit-react-native';
 import { CometChat } from '@cometchat/chat-sdk-react-native';
 import GroupMembersScreen from './GroupMembersScreen';
 import MessageList from './MessageList';
 import MessageComposer from './MessageComposer';
-import { CallManager } from '../call/CallManager';
 import { cometChatConfig } from '../../config/cometChatConfig';
+import IncomingCall from '../call/IncomingCall';
+import OutgoingCall from '../call/OutgoingCall';
 
 interface MessagesProps {
   user?: CometChat.User;
@@ -20,11 +22,9 @@ interface MessagesProps {
 const Messages: React.FC<MessagesProps> = ({ user, group, onBack }) => {
   const [showMembers, setShowMembers] = useState(false);
   const [parentMessage, setParentMessage] = useState<CometChat.BaseMessage | null>(null);
-  const [showCallManager, setShowCallManager] = useState(false);
-  const [callType, setCallType] = useState<string>('');
-  const [receiverId, setReceiverId] = useState<string>('');
-  const [directCallInProgress, setDirectCallInProgress] = useState(false);
   const [cometChatInitialized, setCometChatInitialized] = useState(false);
+  const [incomingCall, setIncomingCall] = useState(false);
+  const [outgoingCall, setOutgoingCall] = useState<CometChat.Call | null>(null);
   
   const handleViewMembers = () => {
     setShowMembers(true);
@@ -38,129 +38,70 @@ const Messages: React.FC<MessagesProps> = ({ user, group, onBack }) => {
     setParentMessage(null);
   };
 
-  const handleCallEnded = () => {
-    setShowCallManager(false);
-    setDirectCallInProgress(false);
-  };
-  
-  const handleCallInitiated = (userId: string, type: string) => {
-    if (!cometChatInitialized) {
-      console.log("Cannot initiate call - CometChat not initialized");
-      return;
-    }
-
-    setReceiverId(userId);
-    setCallType(type);
-    
-    // Try direct API call first
-    try {
-      console.log(`Initiating ${type} call to user ${userId}`);
-      
-      // Set the call in progress flag
-      setDirectCallInProgress(true);
-      
-      // Create a direct call - this bypasses our CallManager component
-      CometChat.initiateCall(
-        new CometChat.Call(userId, type, CometChat.RECEIVER_TYPE.USER)
-      ).then(
-        (outgoingCall) => {
-          console.log('Call initiated successfully:', outgoingCall);
-          // Now show the call manager to handle the ongoing call
-          setShowCallManager(true);
-        },
-        (error) => {
-          console.log('Call initiation failed with error:', error);
-          setDirectCallInProgress(false);
-        }
+  const initiateAudioCall = () => {
+    if (user) {
+      const callObject = new CometChat.Call(
+        user.getUid(),
+        CometChatUiKitConstants.MessageTypeConstants.audio,
+        CometChatUiKitConstants.ReceiverTypeConstants.user
       );
-    } catch (error) {
-      console.error('Error during call initiation:', error);
-      // Fallback to the CallManager component
-      setShowCallManager(true);
-      setDirectCallInProgress(false);
+
+      CometChat.initiateCall(callObject)
+        .then((call) => {
+          console.log("Audio call initiated successfully:", call);
+          setOutgoingCall(call);
+        })
+        .catch(error => {
+          console.error("Error initiating audio call:", error);
+        });
     }
   };
 
-  const handleAudioCall = () => {
-    console.log('Audio call clicked');
+  const initiateVideoCall = () => {
     if (user) {
-      handleCallInitiated(user.getUid(), CometChat.CALL_TYPE.AUDIO);
+      const callObject = new CometChat.Call(
+        user.getUid(),
+        CometChatUiKitConstants.MessageTypeConstants.video,
+        CometChatUiKitConstants.ReceiverTypeConstants.user
+      );
+
+      CometChat.initiateCall(callObject)
+        .then((call) => {
+          console.log("Video call initiated successfully:", call);
+          setOutgoingCall(call);
+        })
+        .catch(error => {
+          console.error("Error initiating video call:", error);
+        });
     }
   };
 
-  const handleVideoCall = () => {
-    console.log('Video call clicked');
-    if (user) {
-      handleCallInitiated(user.getUid(), CometChat.CALL_TYPE.VIDEO);
-    }
+  const handleCallEnded = () => {
+    setOutgoingCall(null);
   };
+ 
 
-  // Initialize CometChat if needed
-  useEffect(() => {
-    const initCometChat = async () => {
-      try {
-        const isInitialized = await CometChat.isInitialized();
-        if (isInitialized) {
-          console.log("CometChat SDK is already initialized");
-          setCometChatInitialized(true);
-          return;
-        }
-
-        const appSettings = new CometChat.AppSettingsBuilder()
-          .subscribePresenceForAllUsers()
-          .setRegion(cometChatConfig.region)
-          .build();
-          
-        await CometChat.init(cometChatConfig.appId, appSettings);
-        console.log("CometChat initialized successfully");
-        setCometChatInitialized(true);
-      } catch (error) {
-        console.error("CometChat initialization failed:", error);
-      }
-    };
-
-    initCometChat();
-  }, []);
 
   if (showMembers && group) {
     return <GroupMembersScreen group={group} onBack={handleBackFromMembers} />;
   }
 
-  if (directCallInProgress) {
-    return (
-      <View style={styles.mainContainer}>
-        <View style={styles.callInProgressContainer}>
-          <Text style={styles.callInProgressText}>Call in progress...</Text>
-        </View>
-      </View>
-    );
+  if (outgoingCall) {
+    return <OutgoingCall call={outgoingCall} onCallEnded={handleCallEnded} />;
   }
 
-  if (showCallManager) {
-    return (
-      <CallManager 
-        onCallEnded={handleCallEnded}
-        userId={receiverId}
-        callType={callType} 
-      />
-    );
-  }
-
-  // Create a custom AuxiliaryButtonView component for call buttons
   const AuxiliaryButtonView = () => {
-    if (!user) return null;
-    
     return (
       <View style={{ flexDirection: 'row' }}>
         <TouchableOpacity 
           style={styles.callButton}
-          onPress={handleAudioCall}
+          onPress={initiateAudioCall}
         >
           <Text style={styles.callButtonText}>📞</Text>
         </TouchableOpacity>
         <TouchableOpacity 
           style={styles.callButton}
-          onPress={handleVideoCall}
+          onPress={initiateVideoCall}
         >
           <Text style={styles.callButtonText}>📹</Text>
         </TouchableOpacity>
@@ -170,13 +111,18 @@ const Messages: React.FC<MessagesProps> = ({ user, group, onBack }) => {
 
   return (
     <View style={styles.mainContainer}>
+      {/* <IncomingCall /> */}
       <CometChatMessageHeader 
         user={user} 
         group={group} 
         onBack={onBack}
-        hideBackButton={false}
-        onError={(error) => console.log('Message Header error', error)}
-        AuxiliaryButtonView={AuxiliaryButtonView}
+        hideBackButton ={false}
+        // AuxiliaryButtonView={AuxiliaryButtonView}
+        // onError={(error) => console.log('Message Header error', error)}
+        // hideVoiceCallButton = {false}
+        // hideVideoCallButton = {false}
+        // usersStatusVisibility = {true}
+
         style={{
           containerStyle: {
             backgroundColor: '#075E54', 
@@ -271,17 +217,7 @@ const styles = StyleSheet.create({
   },
   callButtonText: {
     fontSize: 20,
-    color: '#FFFFFF', // White text/icon color
-  },
-  callInProgressContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  callInProgressText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#128C7E',
+    color: '#FFFFFF',
   },
 });
 

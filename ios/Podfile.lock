@@ -1,5 +1,8 @@
 PODS:
   - boost (1.84.0)
+  - cometchat-calls-sdk-react-native (4.2.1):
+    - React-Core
+    - react-native-webrtc
   - DoubleConversion (1.1.6)
   - DVAssetLoaderDelegate (0.3.3)
   - fast_float (6.1.4)
@@ -9,6 +12,7 @@ PODS:
   - hermes-engine (0.79.0):
     - hermes-engine/Pre-built (= 0.79.0)
   - hermes-engine/Pre-built (0.79.0)
+  - JitsiWebRTC (106.0.0)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -1333,6 +1337,8 @@ PODS:
     - React-jsiexecutor
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
+  - react-native-background-timer (2.4.1):
+    - React-Core
   - react-native-cometchat-ui-kit (5.0.0-beta.1):
     - React-Core
     - react-native-cometchat-ui-kit/Video (= 5.0.0-beta.1)
@@ -1344,6 +1350,8 @@ PODS:
     - React-Core
     - react-native-cometchat-ui-kit/Video
     - SPTPersistentCache (~> 1.1.0)
+  - react-native-netinfo (7.1.7):
+    - React-Core
   - react-native-video (6.12.0):
     - DoubleConversion
     - glog
@@ -1418,6 +1426,9 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-webrtc (1.106.1):
+    - JitsiWebRTC (~> 106.0.0)
+    - React-Core
   - React-NativeModulesApple (0.79.0):
     - glog
     - hermes-engine
@@ -1740,7 +1751,7 @@ PODS:
     - React-logger (= 0.79.0)
     - React-perflogger (= 0.79.0)
     - React-utils (= 0.79.0)
-  - RNCAsyncStorage (2.1.2):
+  - RNCAsyncStorage (1.24.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1891,6 +1902,7 @@ PODS:
 
 DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
+  - "cometchat-calls-sdk-react-native (from `../node_modules/@cometchat/calls-sdk-react-native`)"
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - fast_float (from `../node_modules/react-native/third-party-podspecs/fast_float.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
@@ -1930,8 +1942,11 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
+  - react-native-background-timer (from `../node_modules/react-native-background-timer`)
   - "react-native-cometchat-ui-kit (from `../node_modules/@cometchat/chat-uikit-react-native`)"
+  - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-video (from `../node_modules/react-native-video`)
+  - react-native-webrtc (from `../node_modules/react-native-webrtc`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-oscompat (from `../node_modules/react-native/ReactCommon/oscompat`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -1973,12 +1988,15 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - DVAssetLoaderDelegate
+    - JitsiWebRTC
     - SocketRocket
     - SPTPersistentCache
 
 EXTERNAL SOURCES:
   boost:
     :podspec: "../node_modules/react-native/third-party-podspecs/boost.podspec"
+  cometchat-calls-sdk-react-native:
+    :path: "../node_modules/@cometchat/calls-sdk-react-native"
   DoubleConversion:
     :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
   fast_float:
@@ -2054,10 +2072,16 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
+  react-native-background-timer:
+    :path: "../node_modules/react-native-background-timer"
   react-native-cometchat-ui-kit:
     :path: "../node_modules/@cometchat/chat-uikit-react-native"
+  react-native-netinfo:
+    :path: "../node_modules/@react-native-community/netinfo"
   react-native-video:
     :path: "../node_modules/react-native-video"
+  react-native-webrtc:
+    :path: "../node_modules/react-native-webrtc"
   React-NativeModulesApple:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios"
   React-oscompat:
@@ -2135,6 +2159,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
+  cometchat-calls-sdk-react-native: e86bcbfa94ab2b3d54c6d98548a4b70b9497442c
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
   DVAssetLoaderDelegate: 0caec20e4e08b8560b691131539e9180024d4bce
   fast_float: 06eeec4fe712a76acc9376682e4808b05ce978b6
@@ -2142,6 +2167,7 @@ SPEC CHECKSUMS:
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   hermes-engine: cd4bd90f051e3658c83cc00e87c603dfe1b75947
+  JitsiWebRTC: f441eb0e2d67f0588bf24e21c5162e97342714fb
   RCT-Folly: e78785aa9ba2ed998ea4151e314036f6c49e6d82
   RCTDeprecation: c147f8912f768e5eedbc5f115b2b223d007d9fe3
   RCTRequired: a71a7e9efd6546704d5abc683e0b68fcaa759861
@@ -2173,8 +2199,11 @@ SPEC CHECKSUMS:
   React-logger: a5edba66e28edd1ef973971a2ec5d531eb8621ea
   React-Mapbuffer: 2ef4d104cd7426fdbe4dbb283fcab8235ea92cc8
   React-microtasksnativemodule: a2d19a42269e02a7a86ab1c51fa3a4fa63be00ba
+  react-native-background-timer: 4638ae3bee00320753647900b21260b10587b6f7
   react-native-cometchat-ui-kit: 1d1077eae96648d71b9a2905448257e7057a15fa
+  react-native-netinfo: 14c485c2fedff528dcd44064b132790a21d77b66
   react-native-video: 75309708e5e46a796f5ad2f26f7278c210c9fc86
+  react-native-webrtc: ea360b86e6667ce9f317748d332423c6943483fd
   React-NativeModulesApple: f8c91c74d5d223944c7b7fdeb0695d8ee73f899c
   React-oscompat: faff1df234d57a7368b56e9642222dde9eb9f422
   React-perflogger: 59c434b6ab0741baa4cdc589ba4278889e3fae18
@@ -2206,7 +2235,7 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: 7f5052913dd72a0e84ca95973f9f8bc97f2c5b95
   ReactCodegen: 16700ce5938fd79c1ff4c5b5735f10830f2e6bd3
   ReactCommon: 1257efa9d0b07517d8b79bb4055eaefac1204807
-  RNCAsyncStorage: 39c42c1e478e1f5166d1db52b5055e090e85ad66
+  RNCAsyncStorage: 7c077de553127336f479393dba37e86d6c929db8
   RNCClipboard: 37de6995ef72dc869422879e51a46a520d3f08b3
   RNDateTimePicker: 43ee3de2bc639bc0d9b77564961060a54dfc7111
   RNSVG: 794f269526df9ddc1f79b3d1a202b619df0368e3
