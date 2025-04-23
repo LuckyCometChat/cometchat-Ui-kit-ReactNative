@@ -14,7 +14,7 @@ const CometChatCalls = CallingPackage.CometChatCalls;
 
 interface OngoingCallScreenProps {
   sessionId: string;
-  callSettingsBuilder: any; // Change type to any to avoid compilation errors
+  callSettingsBuilder: any; 
   onError?: (error: CometChat.CometChatException) => void;
 }
 

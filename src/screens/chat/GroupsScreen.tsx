@@ -21,8 +21,6 @@ const GroupsScreen: React.FC<GroupsScreenProps> = ({ onGroupSelect }) => {
               height: '100%',
             },
             headerContainerStyle: {
-              // backgroundColor: "#075E54",
-              // borderBottomWidth: 0,
               paddingTop: 60,
             },
           }}

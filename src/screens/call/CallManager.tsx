@@ -9,7 +9,6 @@ import OutgoingCall from './OutgoingCall';
 import OngoingCallScreen from './OngoingCallScreen';
 import { cometChatConfig } from '../../config/cometChatConfig';
 
-// Get the CometChatCalls from the CallingPackage
 const CometChatCalls = CallingPackage.CometChatCalls;
 
 interface CallManagerProps {
@@ -32,7 +31,7 @@ const CallManager: React.FC<CallManagerProps> = ({ onCallEnded, userId, callType
   const [callSettings, setCallSettings] = useState<typeof CometChatCalls.CallSettingsBuilder | null>(null);
   const [isUIKitInitialized, setIsUIKitInitialized] = useState(false);
 
-  // First ensure CometChatUIKit is initialized
+  
   useEffect(() => {
     const initializeUIKit = async () => {
       try {
@@ -49,7 +48,6 @@ const CallManager: React.FC<CallManagerProps> = ({ onCallEnded, userId, callType
           console.log("CometChat SDK initialized");
         }
         
-        // Try to initialize UIKit if needed
         await CometChatUIKit.init({
           appId: cometChatConfig.appId,
           region: cometChatConfig.region,

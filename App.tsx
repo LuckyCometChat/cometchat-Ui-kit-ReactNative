@@ -4,24 +4,98 @@
  *
  * @format
  */
-
-import React, { useEffect, useState } from 'react';
-import { Platform, PermissionsAndroid, View } from 'react-native';
-import { CometChatUIKit } from '@cometchat/chat-uikit-react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { Platform, PermissionsAndroid, View, AppState, AppStateStatus } from 'react-native';
+import { 
+  CometChatUIKit, 
+  CometChatIncomingCall,
+  CometChatThemeProvider,
+  CometChatUIEventHandler,
+  CometChatUIEvents 
+} from '@cometchat/chat-uikit-react-native';
+import { CometChat } from '@cometchat/chat-sdk-react-native';
 import { cometChatConfig } from './src/config/cometChatConfig';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import ChatScreen from './src/screens/chat/ChatScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+const listenerId = 'app';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [callReceived, setCallReceived] = useState(false);
+  const incomingCall = useRef<CometChat.Call | CometChat.CustomMessage | null>(null);
 
   useEffect(() => {
     initializeCometChat();
     checkLoginStatus();
   }, []);
+
+
+  useEffect(() => {
+    const handleAppStateChange = async (nextState: AppStateStatus) => {
+      if (nextState === 'active') {
+        try {
+          const chatUser = await CometChat.getLoggedinUser();
+          if (!chatUser) {
+            setIsLoggedIn(false);
+          } else {
+            setIsLoggedIn(true);
+          }
+        } catch (error) {
+          console.log('Error verifying CometChat user on resume:', error);
+        }
+      }
+    };
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    return () => subscription.remove();
+  }, []);
+
+  // Set up call listeners when user is logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+
+      CometChat.addCallListener(
+        listenerId,
+        new CometChat.CallListener({
+          onIncomingCallReceived: (call: CometChat.Call) => {
+            CometChatUIEventHandler.emitUIEvent(
+              CometChatUIEvents.ccToggleBottomSheet,
+              {
+                isBottomSheetVisible: false,
+              },
+            );
+            incomingCall.current = call;
+            setCallReceived(true);
+          },
+          onOutgoingCallRejected: () => {
+            incomingCall.current = null;
+            setCallReceived(false);
+          },
+          onIncomingCallCancelled: () => {
+            incomingCall.current = null;
+            setCallReceived(false);
+          },
+        }),
+      );
+
+      CometChatUIEventHandler.addCallListener(listenerId, {
+        ccCallEnded: () => {
+          incomingCall.current = null;
+          setCallReceived(false);
+        },
+      });
+    }
+
+    return () => {
+      // Clean up CometChat listeners
+      CometChatUIEventHandler.removeCallListener(listenerId);
+      CometChat.removeCallListener(listenerId);
+    };
+  }, [isLoggedIn]);
 
   const checkLoginStatus = async () => {
     try {
@@ -45,8 +119,14 @@ const App = () => {
     }
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('loggedInUser');
+      await CometChat.logout();
+      setIsLoggedIn(false);
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
   const initializeCometChat = async () => {
@@ -70,7 +150,6 @@ const App = () => {
           PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
           PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
         ]);
-
         const allGranted = Object.values(granted).every(
           (status) => status === PermissionsAndroid.RESULTS.GRANTED
         );
@@ -84,21 +163,36 @@ const App = () => {
   };
 
   if (!isInitialized || isLoading) {
-    return null; 
+    return null;
   }
 
   return (
-    <View style={{ 
-      flex: 1, 
-      marginBottom:20,
-      // ...(Platform.OS === 'android' ? { marginTop: 30 } : {})
-    }}>
-      {isLoggedIn ? (
-        <ChatScreen onLogout={handleLogout} />
-      ) : (
-        <LoginScreen onLoginSuccess={handleLoginSuccess} />
-      )}
-    </View>
+    <SafeAreaProvider >
+      <CometChatThemeProvider>
+        {/* Incoming call UI overlay */}
+        {isLoggedIn && callReceived && incomingCall.current ? (
+          <CometChatIncomingCall
+            call={incomingCall.current}
+            onDecline={() => {
+              incomingCall.current = null;
+              setCallReceived(false);
+              
+            }}
+          />
+        ) : null}
+        
+        <View style={{
+          flex: 1,
+          marginBottom: 20,
+        }}>
+          {isLoggedIn ? (
+            <ChatScreen onLogout={handleLogout} />
+          ) : (
+            <LoginScreen onLoginSuccess={handleLoginSuccess} />
+          )}
+        </View>
+      </CometChatThemeProvider>
+    </SafeAreaProvider>
   );
 };
 

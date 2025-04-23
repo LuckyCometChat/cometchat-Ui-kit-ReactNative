@@ -49,7 +49,7 @@ const GroupMembersScreen: React.FC<GroupMembersScreenProps> = ({ group, onBack }
       <CometChatThemeProvider>
         <CometChatGroupMembers
           group={group}
-          style={{
+          Style={{
             containerStyle: {
               width: '100%',
               height: '100%',
