@@ -24,17 +24,17 @@ const MessageComposer: React.FC<MessageComposerProps> = ({
         parentMessageId={parentMessageId}
         hideVoiceRecordingButton={true}
         
-        style={{
-          attachmentIconStyle: {
-           tintColor: "#075E54"
-          },
-          sendIconStyle: {
-            tintColor: '#053D38'
-           },
-          //  sendIconContainerStyle: {
-          //   backgroundColor: WHATSAPP_GREEN
-          //  }
-        }}
+        // style={{
+        //   attachmentIconStyle: {
+        //    tintColor: "#075E54"
+        //   },
+        //   sendIconStyle: {
+        //     tintColor: '#053D38'
+        //    },
+        //    sendIconContainerStyle: {
+        //     backgroundColor: WHATSAPP_GREEN
+        //    }
+        // }}
       />
     </View>
   );

@@ -38,47 +38,28 @@ const Messages: React.FC<MessagesProps> = ({ user, group, onBack }) => {
     setParentMessage(null);
   };
 
-  const initiateAudioCall = () => {
-    if (user) {
-      const callObject = new CometChat.Call(
-        user.getUid(),
-        CometChatUiKitConstants.MessageTypeConstants.audio,
-        CometChatUiKitConstants.ReceiverTypeConstants.user
-      );
+  // const initiateAudioCall = () => {
+  //   if (user) {
+  //     const callObject = new CometChat.Call(
+  //       user.getUid(),
+  //       CometChatUiKitConstants.MessageTypeConstants.audio,
+  //       CometChatUiKitConstants.ReceiverTypeConstants.user
+  //     );
 
-      CometChat.initiateCall(callObject)
-        .then((call) => {
-          console.log("Audio call initiated successfully:", call);
-          setOutgoingCall(call);
-        })
-        .catch(error => {
-          console.error("Error initiating audio call:", error);
-        });
-    }
-  };
+  //     CometChat.initiateCall(callObject)
+  //       .then((call) => {
+  //         console.log("Audio call initiated successfully:", call);
+  //         setOutgoingCall(call);
+  //       })
+  //       .catch(error => {
+  //         console.error("Error initiating audio call:", error);
+  //       });
+  //   }
+  // };
 
-  const initiateVideoCall = () => {
-    if (user) {
-      const callObject = new CometChat.Call(
-        user.getUid(),
-        CometChatUiKitConstants.MessageTypeConstants.video,
-        CometChatUiKitConstants.ReceiverTypeConstants.user
-      );
+  
 
-      CometChat.initiateCall(callObject)
-        .then((call) => {
-          console.log("Video call initiated successfully:", call);
-          setOutgoingCall(call);
-        })
-        .catch(error => {
-          console.error("Error initiating video call:", error);
-        });
-    }
-  };
-
-  const handleCallEnded = () => {
-    setOutgoingCall(null);
-  };
+  
  
 
 
@@ -86,9 +67,6 @@ const Messages: React.FC<MessagesProps> = ({ user, group, onBack }) => {
     return <GroupMembersScreen group={group} onBack={handleBackFromMembers} />;
   }
 
-  if (outgoingCall) {
-    return <OutgoingCall call={outgoingCall} onCallEnded={handleCallEnded} />;
-  }
 
 
   
@@ -158,6 +136,25 @@ const Messages: React.FC<MessagesProps> = ({ user, group, onBack }) => {
         <>
           <CometChatThreadHeader 
             parentMessage={parentMessage}
+            style={{
+              containerStyle: {
+                backgroundColor: "#FFFFFF",
+              },
+              messageBubbleContainerStyle: {
+                backgroundColor: "#FFFFFF",
+              },
+              dividerStyle: {
+                backgroundColor: "FFFFFF",
+              },
+              replyCountTextStyle: {
+                color: "black",
+              },
+              outgoingMessageBubbleStyles: {
+                containerStyle: {
+                  backgroundColor: "#075E54",
+                },
+              },
+            }}
           />
           <MessageList 
             user={user} 
