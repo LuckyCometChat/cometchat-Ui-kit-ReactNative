@@ -33,6 +33,7 @@ const UsersScreen: React.FC<UsersScreenProps> = ({ onUserSelect }) => {
             
           }}
           onItemPress={onUserSelect}
+          showBackButton={true}
           // usersRequestBuilder={usersRequestBuilder}
           onError={(error) => {
             console.error('Error in Users component:', error);

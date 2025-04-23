@@ -25,6 +25,7 @@ const GroupsScreen: React.FC<GroupsScreenProps> = ({ onGroupSelect }) => {
             },
           }}
           onItemPress={onGroupSelect}
+          showBackButton={true}
           onError={(error) => {
             console.error('Error in Groups component:', error);
           }}
