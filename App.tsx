@@ -119,16 +119,36 @@ const App = () => {
     }
   };
 
+  // const handleLogout = async () => {
+  //   try {
+  //     await AsyncStorage.removeItem('loggedInUser');
+  //     await CometChatUIKit.logout();
+  //     setIsLoggedIn(false);
+  //   } catch (error) {
+  //     console.error('Error during logout:', error);
+  //   }
+  // };
+
   const handleLogout = async () => {
     try {
+      // First check if user is logged in
+      const user = await CometChat.getLoggedinUser();
+      if (user) {
+        await CometChat.logout();
+        console.log("CometChat logout successful");
+      }
+      
+      // Then clear AsyncStorage
       await AsyncStorage.removeItem('loggedInUser');
-      await CometChat.logout();
       setIsLoggedIn(false);
     } catch (error) {
       console.error('Error during logout:', error);
+      // Still try to update UI even if logout fails
+      await AsyncStorage.removeItem('loggedInUser');
+      setIsLoggedIn(false);
     }
   };
-
+  
   const initializeCometChat = async () => {
     try {
       await getPermissions();
