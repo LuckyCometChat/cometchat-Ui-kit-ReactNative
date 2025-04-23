@@ -26,12 +26,18 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-	  <!-- Do not change NSAllowsArbitraryLoads to true, or you will risk app rejection! -->
 		<key>NSAllowsArbitraryLoads</key>
 		<false/>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+
+	<!-- ✅ Add camera and microphone usage descriptions -->
+	<key>NSCameraUsageDescription</key>
+	<string>Access camera</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Access Microphone</string>
+
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>UILaunchStoryboardName</key>

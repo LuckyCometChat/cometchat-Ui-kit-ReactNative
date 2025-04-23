@@ -12,6 +12,7 @@ import UsersScreen from './UsersScreen';
 import GroupsScreen from './GroupsScreen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { CallManager } from '../call/CallManager';
+import CallLogs from '../call/CallLogs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // WhatsApp Colors
@@ -46,6 +47,34 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onLogout }) => {
     setShowCallManager(false);
   };
 
+  // const handleLogout = async () => {
+  //   Alert.alert(
+  //     'Logout',
+  //     'Are you sure you want to logout?',
+  //     [
+  //       {
+  //         text: 'Cancel',
+  //         style: 'cancel',
+  //       },
+  //       {
+  //         text: 'Logout',
+  //         onPress: async () => {
+  //           try {
+  //             await CometChatUIKit.logout();
+  //             await AsyncStorage.removeItem('loggedInUser');
+  //             if (onLogout) {
+  //               onLogout();
+  //             }
+  //           } catch (error) {
+  //             console.error('Logout failed:', error);
+  //           }
+  //         },
+  //       },
+  //     ],
+  //     { cancelable: true }
+  //   );
+  // };
+
   const handleLogout = async () => {
     Alert.alert(
       'Logout',
@@ -59,13 +88,33 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onLogout }) => {
           text: 'Logout',
           onPress: async () => {
             try {
-              await CometChatUIKit.logout();
+              const user = await CometChat.getLoggedinUser();
+              if (!user) {
+                console.log("No user logged in to logout");
+                await AsyncStorage.removeItem('loggedInUser');
+                if (onLogout) {
+                  onLogout();
+                }
+                return;
+              }
+              
+             
+              await CometChat.logout();
+              console.log("CometChat logout successful");
+              
+         
               await AsyncStorage.removeItem('loggedInUser');
+              
+         
               if (onLogout) {
                 onLogout();
               }
             } catch (error) {
               console.error('Logout failed:', error);
+              Alert.alert(
+                'Logout Error',
+                'Failed to logout. Please try again.'
+              );
             }
           },
         },
@@ -73,8 +122,6 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onLogout }) => {
       { cancelable: true }
     );
   };
-
- 
 
   const renderContent = () => {
     if (showCallManager) {
@@ -96,6 +143,8 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onLogout }) => {
         return <UsersScreen onUserSelect={handleUserSelect} />;
       case 'groups':
         return <GroupsScreen onGroupSelect={handleGroupSelect} />;
+      case 'calls':
+        return <CallLogs onBack={() => setActiveScreen('conversations')} />;
       default:
         return (
           <CometChatConversations
@@ -178,6 +227,24 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ onLogout }) => {
                 ]}
               >
                 Chats
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.tabItem}
+              onPress={() => setActiveScreen('calls')}
+            >
+              <Ionicons
+                name="call"
+                size={24}
+                color={activeScreen === 'calls' ? '#075E54' : '#9E9E9E'}
+              />
+              <Text
+                style={[
+                  styles.tabLabel,
+                  { color: activeScreen === 'calls' ? '#075E54' : '#9E9E9E' },
+                ]}
+              >
+                Calls
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -269,7 +336,7 @@ const styles = StyleSheet.create({
     height: 60,
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
-    elevation: 8,
+    elevation: 0,
   },
   tabItem: {
     flex: 1,
